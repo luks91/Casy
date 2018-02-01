@@ -30,7 +30,8 @@ private const val ALL_BY_FUNCTION_NAME = "allBy"
 private const val ALL_NON_TOPIC_FUNCTION_NAME = "allNonTopic"
 private const val TOPICS_TO_EMITTERS_PROPERTY = "topicsToEmitters"
 
-internal fun generateEmittersClass(roundEnv: RoundEnvironment, processingEnv: ProcessingEnvironment, envData: EnvironmentData) {
+internal fun generateEmittersClass(roundEnv: RoundEnvironment, processingEnv: ProcessingEnvironment,
+                                   envData: EnvironmentData) {
 
     var constructorBuilder = FunSpec.constructorBuilder().addModifiers(KModifier.INTERNAL)
     val emitterClassToField = mutableMapOf<String, PropertySpec>()
@@ -97,7 +98,7 @@ private fun generateInitBlock(setType: ParameterizedTypeName, emitterClassToFiel
             .flatMap { (name, node) ->
                 node.topics.flatMap { topic ->
                     listOf(topic to name)
-                            .plus((envData.paths.get(name) ?: listOf()).map { topic to it })
+                            .plus((envData.paths[name] ?: listOf()).map { topic to it })
                 }
             }
             .groupBy({ it.first }, { it.second })
@@ -112,7 +113,8 @@ private fun generateInitBlock(setType: ParameterizedTypeName, emitterClassToFiel
 
     topicsToEmitters.forEach { (topic, emitters) ->
         initializer.addStatement("$tempMap.put(\"$topic\", " +
-                "${emitters.map { emitterClassToField[it]!!.name }.distinct().joinToString(",\n", "setOf(", ")")})")
+                "${emitters.map { emitterClassToField[it]!!.name }.distinct()
+                        .joinToString(",\n", "setOf(", ")")})")
     }
 
     initializer.addStatement("$TOPICS_TO_EMITTERS_PROPERTY = $tempMap")

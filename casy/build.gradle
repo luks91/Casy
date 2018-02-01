@@ -18,6 +18,7 @@ dependencies {
     compile 'com.squareup:kotlinpoet:0.6.0'
     compile "com.google.auto.service:auto-service:1.0-rc2"
     compile project(":casy-annotations")
+    testImplementation 'junit:junit:4.12'
 }
 
 compileKotlin {
