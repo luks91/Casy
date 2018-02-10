@@ -19,4 +19,4 @@ internal fun calculateTriggerPaths(nodes: Map<String, Node>): Map<String, List<S
         }
 
 private fun calculateTriggerPaths(currentNode: Node, nodes: Map<String, Node>): List<String> =
-        currentNode.triggers.flatMap { calculateTriggerPaths(nodes[it]!!, nodes) + it }
+        currentNode.triggers.flatMap { calculateTriggerPaths(nodes[it]!!, nodes) + it }.distinct()
