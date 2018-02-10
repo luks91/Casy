@@ -14,4 +14,7 @@
 package com.github.luks91.casy
 
 class TriggerPathsCalculatorTest {
+
+
+
 }
