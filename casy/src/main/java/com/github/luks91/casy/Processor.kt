@@ -31,7 +31,7 @@ class Processor : AbstractProcessor() {
     override fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
         messenger = processingEnv.messager
 
-        val adjacency = calculateAdjacency(roundEnv, messenger)
+        val adjacency = calculateAdjacency(roundEnv, messenger, ReflectionStrategy.default())
 
         if (adjacency.isEmpty()) {
             return true
