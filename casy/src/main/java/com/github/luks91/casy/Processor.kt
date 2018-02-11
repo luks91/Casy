@@ -17,6 +17,8 @@ import com.github.luks91.casy.annotations.SyncEmitter
 import com.github.luks91.casy.annotations.SyncGroup
 import com.github.luks91.casy.annotations.SyncRoot
 import com.google.auto.service.AutoService
+import com.squareup.kotlinpoet.asTypeName
+import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Messager
 import javax.annotation.processing.RoundEnvironment
@@ -40,21 +42,61 @@ class Processor : AbstractProcessor() {
         val rootElements = roundEnv.getElementsAnnotatedWith(SyncRoot::class.java)
         if (rootElements.size != 1) {
             processingEnv.messager.printMessage(Diagnostic.Kind.ERROR,
-                    "Common interface for @${SyncEmitter::class.java.simpleName} classes must be annotated as a " +
-                            "${SyncRoot::class.java.simpleName}, currently are: $rootElements")
+                    "Common interface for @${SyncEmitter::class.java.simpleName} " +
+                            "classes must be annotated as a ${SyncRoot::class.java.simpleName}, " +
+                            "currently are: $rootElements")
             return true
         }
 
-        generateEmittersClass(roundEnv, processingEnv,
+        val element = rootElements.first()
+        val annotation = element.getAnnotation(SyncRoot::class.java)
+        val fileSpec = generateEmittersClass(
                 EnvironmentData(
-                        adjacency,
-                        calculateTriggerPaths(adjacency),
+                        processingEnv.elementUtils.getPackageOf(element).toString(),
+                        with(element.simpleName) { "$this${if (endsWith('s')) "es" else "s"}"},
+                        element.asType().asTypeName(),
+                        adjacency.filterValues { it.topics.isEmpty() }.map { it.key },
+                        buildTopicsToEmittersMap(adjacency, calculateTriggerPaths(adjacency), annotation),
                         calculateNodesPriorities(adjacency),
-                        RootData.from(rootElements.first())
+                        buildGroupsToEmittersMap(roundEnv, adjacency)
                 )
         )
+
+        val kaptKotlinGeneratedDir = processingEnv.options[Processor.KAPT_KOTLIN_GENERATED_OPTION_NAME]
+        fileSpec.writeTo(File(kaptKotlinGeneratedDir))
         return true
     }
+
+    private fun buildTopicsToEmittersMap(adjacency: Map<String, Node>,
+                                         paths: Map<String, List<String>>, root: SyncRoot) =
+            adjacency.flatMap { (name, node) ->
+                        node.topics.flatMap { topic ->
+                            listOf(topic to name).plus((paths[name] ?: listOf()).map { topic to it })
+                        }
+                    }
+                    .groupBy({ it.first }, { it.second })
+                    .plus((root.allEmittersTopic.takeIf { !it.isBlank() } ?: "all") to adjacency.keys)
+                    .plus((root.allNonPushEmittersTopic.takeIf { !it.isBlank() } ?: "allNonTopic")
+                            to adjacency.filter { it.value.topics.isEmpty() }.keys
+                    )
+
+    private fun buildGroupsToEmittersMap(roundEnv: RoundEnvironment, adjacency: Map<String, Node>) =
+            mutableMapOf<String, List<String>>().apply {
+                roundEnv.getElementsAnnotatedWith(SyncGroup::class.java).forEach { group ->
+                    val emitters = roundEnv.getElementsAnnotatedWith(group as TypeElement)
+                            .map {
+                                it.asType().asTypeName().toString().apply {
+                                    if (!adjacency.containsKey(this)) {
+                                        val error = "$this is annotated with ${group.simpleName} " +
+                                                "but not ${SyncEmitter::class.simpleName}"
+                                        processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, error)
+                                        throw IllegalStateException(error)
+                                    }
+                                }
+                            }
+                    put(group.simpleName.toString(), emitters)
+                }
+            }
 
     override fun getSupportedAnnotationTypes() = setOf(
             SyncEmitter::class.java.canonicalName,

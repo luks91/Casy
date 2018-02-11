@@ -14,31 +14,30 @@
 package com.github.luks91.casy
 
 import com.github.luks91.casy.annotations.Prioritized
-import com.github.luks91.casy.annotations.SyncEmitter
-import com.github.luks91.casy.annotations.SyncGroup
-import com.squareup.kotlinpoet.*
-import java.io.File
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.TypeName
 import java.util.Collections
-import javax.annotation.processing.Messager
-import javax.annotation.processing.ProcessingEnvironment
-import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.TypeElement
-import javax.tools.Diagnostic
 
 private const val ALL_FUNCTION_NAME = "all"
 private const val ALL_BY_FUNCTION_NAME = "allBy"
 private const val ALL_NON_TOPIC_FUNCTION_NAME = "allNonTopic"
 private const val TOPICS_TO_EMITTERS_PROPERTY = "topicsToEmitters"
 
-internal fun generateEmittersClass(roundEnv: RoundEnvironment, processingEnv: ProcessingEnvironment,
-                                   envData: EnvironmentData) {
+internal fun generateEmittersClass(envData: EnvironmentData): FileSpec {
 
     var constructorBuilder = FunSpec.constructorBuilder().addModifiers(KModifier.INTERNAL)
     val emitterClassToField = mutableMapOf<String, PropertySpec>()
     val properties = mutableListOf<PropertySpec>()
-    val rootElement = envData.rootData.element
-    val rootClass = rootElement.asType().asTypeName()
-    val prioritizedType = ParameterizedTypeName.get(Prioritized::class.asTypeName(), rootClass)
+    val prioritizedType = ParameterizedTypeName.get(
+            Prioritized::class.asTypeName(), envData.rootTypeName)
 
     envData.nodePriorities.forEach {
         val emitterFullName = it.key
@@ -54,10 +53,6 @@ internal fun generateEmittersClass(roundEnv: RoundEnvironment, processingEnv: Pr
         emitterClassToField.put(emitterFullName, emitterProperty)
         properties.add(emitterProperty)
     }
-
-    val packageName = processingEnv.elementUtils.getPackageOf(rootElement).toString()
-    val className = with(rootElement.simpleName) { "$this${if (endsWith('s')) "es" else "s"}"}
-
     val setType = ParameterizedTypeName.get(Set::class.asTypeName(), prioritizedType)
 
     properties.add(generateTopicsToEmittersProperty(setType))
@@ -66,21 +61,19 @@ internal fun generateEmittersClass(roundEnv: RoundEnvironment, processingEnv: Pr
     val returnType = ParameterizedTypeName.get(Collection::class.asTypeName(), prioritizedType)
     functions.add(generateAllMethod(returnType))
     functions.add(generateAllByMethod(returnType))
-    functions.add(generateAllNonTopicMethod(envData.adjacency, emitterClassToField, returnType))
-    functions.addAll(generateGroupMethods(returnType, roundEnv, processingEnv.messager, emitterClassToField))
+    functions.add(generateAllNonTopicMethod(envData.nonTopicEmitters, emitterClassToField, returnType))
+    functions.addAll(generateGroupMethods(returnType, emitterClassToField, envData.groups))
 
-    val file = FileSpec.builder(packageName, className)
+    return FileSpec.builder(envData.rootPackageName, envData.emittersName)
             .indent("   ")
-            .addType(TypeSpec.classBuilder(className)
+            .addType(TypeSpec.classBuilder(envData.emittersName)
                     .primaryConstructor(constructorBuilder.build())
-                    .addInitializerBlock(generateInitBlock(setType, emitterClassToField, envData))
+                    .addInitializerBlock(generateInitBlock(setType, emitterClassToField,
+                            envData.topicsToEmitters))
                     .addProperties(properties)
                     .addFunctions(functions)
                     .build())
             .build()
-
-    val kaptKotlinGeneratedDir = processingEnv.options[Processor.KAPT_KOTLIN_GENERATED_OPTION_NAME]
-    file.writeTo(File(kaptKotlinGeneratedDir))
 }
 
 private fun generateTopicsToEmittersProperty(setType: ParameterizedTypeName): PropertySpec {
@@ -92,20 +85,7 @@ private fun generateTopicsToEmittersProperty(setType: ParameterizedTypeName): Pr
 }
 
 private fun generateInitBlock(setType: ParameterizedTypeName, emitterClassToField: Map<String, PropertySpec>,
-                              envData: EnvironmentData): CodeBlock {
-
-    val topicsToEmitters = envData.adjacency
-            .flatMap { (name, node) ->
-                node.topics.flatMap { topic ->
-                    listOf(topic to name)
-                            .plus((envData.paths[name] ?: listOf()).map { topic to it })
-                }
-            }
-            .groupBy({ it.first }, { it.second })
-            .plus((envData.rootData.allEmittersTopic.takeIf { !it.isBlank() } ?: "all") to envData.adjacency.keys)
-            .plus((envData.rootData.allNonPushEmittersTopic.takeIf { !it.isBlank() } ?: "allNonTopic")
-                    to envData.adjacency.filter { it.value.topics.isEmpty() }.keys
-            )
+                              topicsToEmitters: Map<String, Collection<String>>): CodeBlock {
 
     val tempMap = "tempMap"
     val initializer = CodeBlock.builder()
@@ -147,11 +127,12 @@ private fun generateAllByMethod(emittersType: TypeName): FunSpec {
             .build()
 }
 
-private fun generateAllNonTopicMethod(adjacency: Map<String, Node>, emitterClassToField: Map<String, PropertySpec>,
+private fun generateAllNonTopicMethod(nonTopicEmitters: List<String>,
+                                      emitterClassToField: Map<String, PropertySpec>,
                                       emittersType: TypeName): FunSpec {
 
-    val emitters = adjacency.filterValues { it.topics.isEmpty() }.map { (key, _) -> emitterClassToField[key]!!.name }
-    val emittersStatement = emitters.joinToString(",\n", "    setOf(\n", ")", transform = {"        $it"})
+    val emitters = nonTopicEmitters.map { emitterClassToField[it]!!.name }
+    val emittersStatement = emitters.joinToString(",\n", "    setOf(\n", ")", transform = { "        $it" })
     val methodStatement = if (emitters.isEmpty()) {
         "return setOf()"
     } else {
@@ -166,28 +147,20 @@ private fun generateAllNonTopicMethod(adjacency: Map<String, Node>, emitterClass
             .build()
 }
 
-private fun generateGroupMethods(emittersType: TypeName, roundEnv: RoundEnvironment, messager: Messager,
-                                 emitterClassToField: Map<String, PropertySpec>): List<FunSpec> {
-    val groups = roundEnv.getElementsAnnotatedWith(SyncGroup::class.java)
+private fun generateGroupMethods(emittersType: TypeName, emitterClassToField: Map<String, PropertySpec>,
+                                 groups: Map<String, List<String>>): List<FunSpec> {
     val returnList = mutableListOf<FunSpec>()
-    groups.forEach { group ->
-        val emitters = roundEnv.getElementsAnnotatedWith(group as TypeElement)
-                .map {
-                    val emitterClazz = it.asType().asTypeName().toString()
-                    val emitter = emitterClassToField[emitterClazz]
-                    if (emitter == null) {
-                        val error = "$emitterClazz is annotated with ${group.simpleName} but not ${SyncEmitter::class.simpleName}"
-                        messager.printMessage(Diagnostic.Kind.ERROR, error)
-                        throw IllegalStateException(error)
-                    }
-                    return@map emitter.name
-                }
-                .joinToString(",\n", "    setOf(\n", ")", transform = {"        $it"})
 
-        returnList.add(FunSpec.builder("all${group.simpleName}")
+    groups.forEach { (groupName, emitters) ->
+        val appendedEmitters = emitters
+                .map { emitterClassToField[it]!!.name }
+                .joinToString(",\n", "    setOf(\n", ")", transform = { "        $it" })
+
+        returnList.add(FunSpec.builder("all$groupName")
                 .returns(emittersType)
                 .addCode(CodeBlock.builder()
-                        .addStatement("return %T.unmodifiableList(\n$emitters.distinct()\n)", Collections::class.asTypeName())
+                        .addStatement("return %T.unmodifiableList(\n$appendedEmitters.distinct()\n)",
+                                Collections::class.asTypeName())
                         .build())
                 .build())
     }
