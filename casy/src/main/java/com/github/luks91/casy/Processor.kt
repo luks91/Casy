@@ -42,7 +42,7 @@ class Processor : AbstractProcessor() {
         val rootElements = roundEnv.getElementsAnnotatedWith(SyncRoot::class.java)
         if (rootElements.size != 1) {
             processingEnv.messager.printMessage(Diagnostic.Kind.ERROR,
-                    "Common interface for @${SyncEmitter::class.java.simpleName} " +
+                    "One common interface for @${SyncEmitter::class.java.simpleName} " +
                             "classes must be annotated as a ${SyncRoot::class.java.simpleName}, " +
                             "currently are: $rootElements")
             return true
@@ -50,7 +50,7 @@ class Processor : AbstractProcessor() {
 
         val element = rootElements.first()
         val annotation = element.getAnnotation(SyncRoot::class.java)
-        val fileSpec = generateEmittersClass(
+        generateEmittersClass(
                 EnvironmentData(
                         processingEnv.elementUtils.getPackageOf(element).toString(),
                         with(element.simpleName) { "$this${if (endsWith('s')) "es" else "s"}"},
@@ -60,10 +60,7 @@ class Processor : AbstractProcessor() {
                         calculateNodesPriorities(adjacency),
                         buildGroupsToEmittersMap(roundEnv, adjacency)
                 )
-        )
-
-        val kaptKotlinGeneratedDir = processingEnv.options[Processor.KAPT_KOTLIN_GENERATED_OPTION_NAME]
-        fileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        ).writeTo(File(processingEnv.options[Processor.KAPT_KOTLIN_GENERATED_OPTION_NAME]))
         return true
     }
 
