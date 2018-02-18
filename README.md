@@ -8,7 +8,7 @@ Many modern server architectures expose multiple endpoints to synchronize data f
 - [GET] Pull Request Details for given IDs
 
 Before we even attempt to synchronize users and details endpoints, we have to acquire the pull requests first. Once we retrieve a list of data from the server, we can extract the needed IDs and query the server for additional data. What's important here is that the following conditions take place:
-- Users and Pull Requests Details endpoints are always synchronized after Pull Requests
+- Users and Pull Requests Details endpoints are always synchronized after Pull Requests.
 - Each time we synchronize Pull Requests, we should query the other endpoints as the data may have changed (e.g. new user had been assigned to a pull request).
 - Once pull requests data is retrieved, the order in which we synchronize Users and Pull Request Details does not matter. In fact these can be synchronized in parallel.
 
@@ -16,10 +16,10 @@ Before we even attempt to synchronize users and details endpoints, we have to ac
 
 This is where Casy helps. The library assumptions are that:
 - Each endpoint is synchronized separately in a dedicated class. We will call these emitters going forward.
-- There is a common interface defined for all the emitters
-- Each emitter specifies its dependencies with other emitters (triggeredBy and syncsAfter)
+- There is a common interface defined for all the emitters.
+- Each emitter specifies its dependencies with other emitters (triggeredBy and syncsAfter).
 - Emitters can be groupped into topics (reflecting push topics). When we obtain an emitter for a given topic, we are also going to receive all the other emitters that are triggered by the emitter, recursively.
-- Emitters can be groupped into custom sets
+- Emitters can be groupped into custom sets.
 - The library generates a class that shields user from all the complex dependencies, allowing easy lookup of the emitters.
 
 ## Getting started
@@ -44,7 +44,7 @@ kapt 'com.github.luks91:casy:1.0.1'
 api 'com.github.luks91:casy-annotations:1.0.1'
 ```
 
-Then define common interface/class for all your emitter classes. Note that it's totally up to you how the interface will look like and what operations will it expose.
+Then define common interface/class for all your emitter classes. Note that it's totally up to you how the interface will look like and what operations will it expose. That could be e.g. [Retrofit](http://square.github.io/retrofit/) interface.
 ```kotlin
 import com.github.luks91.casy.annotations.SyncRoot
 
@@ -172,7 +172,7 @@ class Synchronizables internal constructor(
 
 ```
 
-Note the Prioritized class here. It wraps both the emitters and its priority (category). The lower the priority the sooner the endpoint should be synchronized. Emitters with the same priority can be synchronized in parallel with any framework / custom synchronization mechanim of your choice. You can also use any sort of dependency injection framework - like Dagger - to instantiate all the emitters classes and use them to create instance of the generated class.
+Note the Prioritized class here. It wraps both the emitters and its priority (category). The lower the priority the sooner the endpoint should be synchronized. Emitters with the same priority can be synchronized in parallel with any framework / custom synchronization mechanim of your choice. You can also use any sort of dependency injection framework - like [Dagger](https://google.github.io/dagger/) - to instantiate all the emitters classes and use them to create instance of the generated class.
 
 ## Generated class methods overview
 - ```all()``` - returns all the emitters classes wrapped in Prioritized objects.
