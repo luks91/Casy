@@ -172,7 +172,7 @@ class Synchronizables internal constructor(
 
 ```
 
-Note the Prioritized class here. It wraps both the emitters and its priority (category). The lower the priority the sooner the endpoint should be synchronized. Emitters with the same priority can be synchronized in parallel with any framework / custom synchronization mechanim of your choice. You can also use any sort of dependency injection framework - like [Dagger](https://google.github.io/dagger/) - to instantiate all the emitters classes and use them to create instance of the generated class.
+Note the Prioritized class here. It wraps both the emitters and its priority (category). The lower the priority the sooner the endpoint should be synchronized. Also no emitters with priority N can be synchronized until all the considered emitters with priority less that N have completed synchronizing. Emitters with the same priority can be synchronized in parallel with any framework / custom synchronization mechanim of your choice. You can also use any sort of dependency injection framework - like [Dagger](https://google.github.io/dagger/) - to instantiate all the emitters classes and use them to create instance of the generated class.
 
 ## Generated class methods overview
 - ```all()``` - returns all the emitters classes wrapped in Prioritized objects.
