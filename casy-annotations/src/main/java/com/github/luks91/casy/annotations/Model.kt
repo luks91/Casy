@@ -16,11 +16,11 @@ package com.github.luks91.casy.annotations
 /**
  * Main data class that is returned by all the methods in Casy-generated synchronization class.
  *
- * @param item Specific instance of {@link SyncEmitter} class represented by this object. Note that
- * the type T will be equivalent to the type annotated with {@link SyncRoot}.
- * @param priority Priority of the {@link SyncEmitter} calculated during the compilation process.
+ * @param item Specific instance of [SyncEmitter] class represented by this object. Note that
+ * the type T will be equivalent to the type annotated with [SyncRoot].
+ * @param priority Priority of the [SyncEmitter] calculated during the compilation process.
  * Note that emitters with lower priority should be synchronized always before the higher priorities.
- * See {@link SyncEmitter} for more details.
+ * See [SyncEmitter] for more details.
  */
 data class Prioritized<out T>(
         @JvmField val item: T,
