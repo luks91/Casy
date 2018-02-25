@@ -28,17 +28,7 @@ First include Casy to your project.
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-kapt {
-    generateStubs = true
-}
-
-android {
-    //...
-    sourceSets {
-        debug.java.srcDirs += 'build/generated/source/kaptKotlin/debug'
-        release.java.srcDirs += 'build/generated/source/kaptKotlin/release'
-    }
-}
+//...
 
 kapt 'com.github.luks91:casy:1.1.0'
 api 'com.github.luks91:casy-annotations:1.1.0'
