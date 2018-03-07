@@ -1,6 +1,8 @@
 # Casy (CAtegorized SYnchronization)
 A library that shields users from complex dependency management when application data is obtained from multiple backend endpoints that have various relationships between each other.
 
+![Maven Central](https://img.shields.io/maven-central/v/com.github.luks91/casy.svg?style=flat)
+
 ## How does it help?
 Many modern server architectures expose multiple endpoints to synchronize data for clients. Let's take an example of Bitbucket pull requests, their details and users assigned to them. These would be represented by 3 server endpoints:
 - [GET] Pull Requests
