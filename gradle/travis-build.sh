@@ -2,3 +2,4 @@
 # This script will build the project.
 
 ./gradlew clean build test
+./gradlew codeCoverageReport
