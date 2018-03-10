@@ -35,12 +35,11 @@ class GeneratorTest {
 
     @Test
     fun classNameShoutMatchRoot() {
-        val nonTopicEmitters = listOf<String>()
         val topicToEmitter = mapOf<String, Collection<String>>()
         val priorities = mapOf("List" to 1L, "java.lang.String" to 2L)
         val envData = EnvironmentData(
                 "com.root.hehe", "Emitters",
-                List::class.asTypeName(), nonTopicEmitters, topicToEmitter, priorities, mapOf())
+                List::class.asTypeName(), topicToEmitter, priorities, mapOf())
 
         val fileSpec = generateEmittersClass(envData)
         val textBuilder = StringBuilder()
@@ -79,71 +78,12 @@ class GeneratorTest {
                     "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
                     "      }\n" +
                     "   }\n" +
-                    "\n" +
-                    "   fun allNonTopic(): Collection<Prioritized<List>> = setOf()\n" +
                     "}\n",
                 textBuilder.toString())
     }
 
     @Test
-    fun shouldGenerateWithNoTopics() {
-        val nonTopicEmitters = listOf("List", "java.lang.String")
-        val topicToEmitter = mapOf<String, Collection<String>>()
-        val priorities = mapOf("List" to 1L, "java.lang.String" to 2L)
-        val envData = EnvironmentData(
-                "com.root.hehe", "Emitters",
-                List::class.asTypeName(), nonTopicEmitters, topicToEmitter, priorities, mapOf())
-
-        val fileSpec = generateEmittersClass(envData)
-        val textBuilder = StringBuilder()
-        fileSpec.writeTo(textBuilder)
-        assertEquals(
-                "package com.root.hehe\n" +
-                        "\n" +
-                        "import com.github.luks91.casy.annotations.Prioritized\n" +
-                        "import java.lang.String\n" +
-                        "import java.util.Collections\n" +
-                        "import kotlin.collections.Collection\n" +
-                        "import kotlin.collections.List\n" +
-                        "import kotlin.collections.Map\n" +
-                        "import kotlin.collections.Set\n" +
-                        "\n" +
-                        "class Emitters internal constructor(emitterList: List, emitterString: String) {\n" +
-                        "   private val prioritizedList: Prioritized<List> = \n" +
-                        "         Prioritized<List>(emitterList, 1)\n" +
-                        "\n" +
-                        "   private val prioritizedString: Prioritized<List> = \n" +
-                        "         Prioritized<List>(emitterString, 2)\n" +
-                        "\n" +
-                        "   private val topicsToEmitters: Map<kotlin.String, Set<Prioritized<List>>>\n" +
-                        "\n" +
-                        "   init {\n" +
-                        "      val tempMap = mutableMapOf<kotlin.String, Set<Prioritized<List>>>()\n" +
-                        "      topicsToEmitters = tempMap\n" +
-                        "   }\n" +
-                        "\n" +
-                        "   fun all(): Collection<Prioritized<List>> = Collections.unmodifiableList(topicsToEmitters.values.flatMap { it }.distinct())\n" +
-                        "\n" +
-                        "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> {\n" +
-                        "      if (topics.isEmpty()) {\n" +
-                        "         return all()\n" +
-                        "      } else {\n" +
-                        "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
-                        "      }\n" +
-                        "   }\n" +
-                        "\n" +
-                        "   fun allNonTopic(): Collection<Prioritized<List>> = Collections.unmodifiableList(\n" +
-                        "       setOf(\n" +
-                        "           prioritizedList,\n" +
-                        "           prioritizedString).distinct()\n" +
-                        "   )\n" +
-                        "}\n",
-                textBuilder.toString())
-    }
-
-    @Test
     fun shouldRespectPriorities() {
-        val nonTopicEmitters = listOf("List", "java.lang.String")
         val topicToEmitter = mapOf(
                 "topic1" to listOf("List", "Set", "Map")
         )
@@ -151,7 +91,7 @@ class GeneratorTest {
                 "Map" to 1L, "Set" to 2L)
         val envData = EnvironmentData(
                 "com.root.heher", "Emitters2",
-                List::class.asTypeName(), nonTopicEmitters, topicToEmitter, priorities, mapOf())
+                List::class.asTypeName(), topicToEmitter, priorities, mapOf())
 
         val fileSpec = generateEmittersClass(envData)
         val textBuilder = StringBuilder()
@@ -204,12 +144,6 @@ class GeneratorTest {
                     "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
                     "      }\n" +
                     "   }\n" +
-                    "\n" +
-                    "   fun allNonTopic(): Collection<Prioritized<List>> = Collections.unmodifiableList(\n" +
-                    "       setOf(\n" +
-                    "           prioritizedList,\n" +
-                    "           prioritizedString).distinct()\n" +
-                    "   )\n" +
                     "}\n",
                 textBuilder.toString())
     }
@@ -226,7 +160,7 @@ class GeneratorTest {
                 "Map" to 1L, "Set" to 2L)
         val envData = EnvironmentData(
                 "com.root.heher", "Emitters2",
-                List::class.asTypeName(), nonTopicEmitters, topicToEmitter, priorities, mapOf())
+                List::class.asTypeName(), topicToEmitter, priorities, mapOf())
 
         val fileSpec = generateEmittersClass(envData)
         val textBuilder = StringBuilder()
@@ -282,12 +216,6 @@ class GeneratorTest {
                         "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
                         "      }\n" +
                         "   }\n" +
-                        "\n" +
-                        "   fun allNonTopic(): Collection<Prioritized<List>> = Collections.unmodifiableList(\n" +
-                        "       setOf(\n" +
-                        "           prioritizedList,\n" +
-                        "           prioritizedString).distinct()\n" +
-                        "   )\n" +
                         "}\n",
                 textBuilder.toString())
     }
@@ -308,7 +236,7 @@ class GeneratorTest {
         )
         val envData = EnvironmentData(
                 "com.root.heher", "Emitters2",
-                List::class.asTypeName(), nonTopicEmitters, topicToEmitter, priorities, groups)
+                List::class.asTypeName(), topicToEmitter, priorities, groups)
 
         val fileSpec = generateEmittersClass(envData)
         val textBuilder = StringBuilder()
@@ -365,23 +293,17 @@ class GeneratorTest {
                         "      }\n" +
                         "   }\n" +
                         "\n" +
-                        "   fun allNonTopic(): Collection<Prioritized<List>> = Collections.unmodifiableList(\n" +
-                        "       setOf(\n" +
-                        "           prioritizedList,\n" +
-                        "           prioritizedString).distinct()\n" +
-                        "   )\n" +
-                        "\n" +
-                        "   fun allAlpha(): Collection<Prioritized<List>> = Collections.unmodifiableList(\n" +
+                        "   fun allAlpha(): Collection<Prioritized<List>> = Collections.unmodifiableSet(\n" +
                         "       setOf(\n" +
                         "           prioritizedList,\n" +
                         "           prioritizedSet,\n" +
-                        "           prioritizedMap).distinct()\n" +
+                        "           prioritizedMap)\n" +
                         "   )\n" +
                         "\n" +
-                        "   fun allBeta(): Collection<Prioritized<List>> = Collections.unmodifiableList(\n" +
+                        "   fun allBeta(): Collection<Prioritized<List>> = Collections.unmodifiableSet(\n" +
                         "       setOf(\n" +
                         "           prioritizedString,\n" +
-                        "           prioritizedSet).distinct()\n" +
+                        "           prioritizedSet)\n" +
                         "   )\n" +
                         "}\n",
                 textBuilder.toString())

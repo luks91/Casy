@@ -20,20 +20,21 @@ import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.asTypeName
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Messager
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
-import kotlin.properties.Delegates
 
 @AutoService(Processor::class)
 class Processor : AbstractProcessor() {
 
-    override fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        messenger = processingEnv.messager
+    companion object {
+        const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
+    }
 
-        val adjacency = calculateAdjacency(roundEnv, messenger, ReflectionStrategy.default())
+    override fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
+        val adjacency = calculateAdjacency(roundEnv, processingEnv.messager,
+                ReflectionStrategy.default())
 
         if (adjacency.isEmpty()) {
             return true
@@ -52,30 +53,40 @@ class Processor : AbstractProcessor() {
         val annotation = element.getAnnotation(SyncRoot::class.java)
         generateEmittersClass(
                 EnvironmentData(
-                        processingEnv.elementUtils.getPackageOf(element).toString(),
-                        with(element.simpleName) { "$this${if (endsWith('s')) "es" else "s"}"},
-                        element.asType().asTypeName(),
-                        adjacency.filterValues { it.topics.isEmpty() }.map { it.key },
-                        buildTopicsToEmittersMap(adjacency, calculateTriggerPaths(adjacency), annotation),
-                        calculateNodesPriorities(adjacency),
-                        buildGroupsToEmittersMap(roundEnv, adjacency)
+                        rootPackageName = processingEnv.elementUtils.getPackageOf(element).toString(),
+                        emittersName = with(element.simpleName) { "$this${if (endsWith('s')) "es" else "s"}"},
+                        rootTypeName = element.asType().asTypeName(),
+                        topicsToEmitters = buildTopicsToEmittersMap(adjacency,
+                                calculateTriggerPaths(adjacency), annotation),
+                        nodePriorities = calculateNodesPriorities(adjacency),
+                        groups = buildGroupsToEmittersMap(roundEnv, adjacency)
                 )
-        ).writeTo(File(processingEnv.options[Processor.KAPT_KOTLIN_GENERATED_OPTION_NAME]))
+        ).writeTo(File(processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]))
         return true
     }
 
     private fun buildTopicsToEmittersMap(adjacency: Map<String, Node>,
                                          paths: Map<String, List<String>>, root: SyncRoot) =
             adjacency.flatMap { (name, node) ->
-                        node.topics.flatMap { topic ->
-                            listOf(topic to name).plus((paths[name] ?: listOf()).map { topic to it })
-                        }
-                    }
-                    .groupBy({ it.first }, { it.second })
-                    .plus((root.allEmittersTopic.takeIf { !it.isBlank() } ?: "all") to adjacency.keys)
-                    .plus((root.allNonPushEmittersTopic.takeIf { !it.isBlank() } ?: "allNonTopic")
-                            to adjacency.filter { it.value.topics.isEmpty() }.keys
-                    )
+                node.topics.flatMap { topic ->
+                    listOf(topic to name).plus((paths[name] ?: listOf()).map { topic to it })
+                }
+            }
+            .groupBy({ it.first }, { it.second })
+            .let { map -> allPair(root, adjacency)?.let { map.plus(it) } ?: map }
+            .let { map -> allNonPushPair(root, adjacency, paths)?.let { map.plus(it) } ?: map }
+
+    private fun allPair(root: SyncRoot, adjacency: Map<String, Node>) =
+            root.allEmittersTopic.takeIf { !it.isBlank() }?.let { it to adjacency.keys }
+
+    private fun allNonPushPair(root: SyncRoot, adjacency: Map<String, Node>,
+                               paths: Map<String, List<String>>): Pair<String, Set<String>>? =
+        root.allNonPushEmittersTopic
+                .takeIf { !it.isBlank() }
+                ?.let { topic ->
+                    val emitters = adjacency.filter { it.value.topics.isEmpty() }.keys
+                    return@let topic to emitters.flatMap { (paths[it] ?: listOf()) + it }.toSet()
+                }
 
     private fun buildGroupsToEmittersMap(roundEnv: RoundEnvironment, adjacency: Map<String, Node>) =
             mutableMapOf<String, List<String>>().apply {
@@ -102,9 +113,4 @@ class Processor : AbstractProcessor() {
     )
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latest()
-
-    companion object {
-        const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
-        var messenger: Messager by Delegates.notNull<Messager>()
-    }
 }

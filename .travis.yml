@@ -1,0 +1,22 @@
+language: android
+
+jdk:
+  - oraclejdk8
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - android-26
+    - build-tools-26.0.2
+
+sudo: false
+script: gradle/travis-build.sh
+
+notifications:
+  email: false
+
+cache:
+  directories:
+  - $HOME/.m2
+  - $HOME/.gradle

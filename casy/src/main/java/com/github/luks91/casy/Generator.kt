@@ -28,7 +28,6 @@ import java.util.Collections
 
 private const val ALL_FUNCTION_NAME = "all"
 private const val ALL_BY_FUNCTION_NAME = "allBy"
-private const val ALL_NON_TOPIC_FUNCTION_NAME = "allNonTopic"
 private const val TOPICS_TO_EMITTERS_PROPERTY = "topicsToEmitters"
 
 internal fun generateEmittersClass(envData: EnvironmentData): FileSpec {
@@ -61,7 +60,6 @@ internal fun generateEmittersClass(envData: EnvironmentData): FileSpec {
     val returnType = ParameterizedTypeName.get(Collection::class.asTypeName(), prioritizedType)
     functions.add(generateAllMethod(returnType))
     functions.add(generateAllByMethod(returnType))
-    functions.add(generateAllNonTopicMethod(envData.nonTopicEmitters, emitterClassToField, returnType))
     functions.addAll(generateGroupMethods(returnType, emitterClassToField, envData.groups))
 
     return FileSpec.builder(envData.rootPackageName, envData.emittersName)
@@ -127,26 +125,6 @@ private fun generateAllByMethod(emittersType: TypeName): FunSpec {
             .build()
 }
 
-private fun generateAllNonTopicMethod(nonTopicEmitters: List<String>,
-                                      emitterClassToField: Map<String, PropertySpec>,
-                                      emittersType: TypeName): FunSpec {
-
-    val emitters = nonTopicEmitters.map { emitterClassToField[it]!!.name }
-    val emittersStatement = emitters.joinToString(",\n", "    setOf(\n", ")", transform = { "        $it" })
-    val methodStatement = if (emitters.isEmpty()) {
-        "return setOf()"
-    } else {
-        "return %T.unmodifiableList(\n$emittersStatement.distinct()\n)"
-    }
-
-    return FunSpec.builder(ALL_NON_TOPIC_FUNCTION_NAME)
-            .returns(emittersType)
-            .addCode(CodeBlock.builder()
-                    .addStatement(methodStatement, Collections::class.asTypeName())
-                    .build())
-            .build()
-}
-
 private fun generateGroupMethods(emittersType: TypeName, emitterClassToField: Map<String, PropertySpec>,
                                  groups: Map<String, List<String>>): List<FunSpec> {
     val returnList = mutableListOf<FunSpec>()
@@ -159,7 +137,7 @@ private fun generateGroupMethods(emittersType: TypeName, emitterClassToField: Ma
         returnList.add(FunSpec.builder("all$groupName")
                 .returns(emittersType)
                 .addCode(CodeBlock.builder()
-                        .addStatement("return %T.unmodifiableList(\n$appendedEmitters.distinct()\n)",
+                        .addStatement("return %T.unmodifiableSet(\n$appendedEmitters\n)",
                                 Collections::class.asTypeName())
                         .build())
                 .build())

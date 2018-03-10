@@ -36,7 +36,7 @@ import kotlin.reflect.KClass
  * <br>
  * Output of the annotation processing during compilation is a class allowing the user to retrieve
  * [Prioritized] [SyncEmitter]s based on various criteria. This includes and is not limited to:
- * list of emitters per topic, all emitters, all non-topic emitters, specific groups of emitters.
+ * list of emitters per topic, all emitters and specific custom groups of emitters.
  * Please refer to [SyncRoot] and [SyncGroup] for more details.
  *
  * @param triggeredBy Specifies that the data endpoint annotated should always synchronize once
@@ -86,19 +86,19 @@ annotation class SyncEmitter(
  * *allBy* method will return all the known emitters, wrapped in [Prioritized] class,
  * reflecting their sync priority. Priorities are calculated explicitly based
  * on [SyncEmitter]'s triggeredBy and syncsAfter priorities. Please see [SyncEmitter] for more details.
- * In case no value or an empty string is provided for this parameter, default value of "all" will be used.
+ * In case no value or an empty string is provided for this parameter then nothing is additionally generated
  *
  * @param allNonPushEmittersTopic Similarly to allEmittersTopic, this parameter will drive additional
  * topic to retrieve a collection of emitters. The difference is that this topic will return all [Prioritized]
  * instances of [SyncEmitter] that have no topics specified plus all the sub-emitters they trigger, recursively.
- * In case no value or an empty string is provided for this parameter, default value of "allNonTopic" will be used.
+ * In case no value or an empty string is provided for this parameter then nothing is additionally generated.
  */
 @Inherited
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
 annotation class SyncRoot(
-        val allEmittersTopic: String = "all",
-        val allNonPushEmittersTopic: String = "allNonTopic"
+        val allEmittersTopic: String = "",
+        val allNonPushEmittersTopic: String = ""
 )
 
 /**

@@ -62,3 +62,12 @@ class ObjectsSynchronizer: Synchronizable {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
+@SyncEmitter(
+        topics = ["object_details"],
+        triggeredBy = [ObjectsSynchronizer::class]
+)
+class ObjectsDetailsSynchronizer: Synchronizable {
+    override fun synchronize(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}

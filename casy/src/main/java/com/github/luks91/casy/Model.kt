@@ -20,7 +20,6 @@ internal data class EnvironmentData(
         val rootPackageName: String,
         val emittersName: String,
         val rootTypeName: TypeName,
-        val nonTopicEmitters: List<String>,
         val topicsToEmitters: Map<String, Collection<String>>,
         val nodePriorities: Map<String, Long>,
         val groups: Map<String, List<String>>
