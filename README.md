@@ -164,11 +164,6 @@ class Synchronizables internal constructor(
          return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())
       }
    }
-
-   fun allNonTopic(): Collection<Prioritized<Synchronizable>> = Collections.unmodifiableList(
-       setOf(
-           prioritizedObjectsSynchronizer).distinct()
-   )
 }
 
 ```
@@ -305,18 +300,16 @@ class Synchronizables internal constructor(
       }
    }
 
-   fun allNonTopic(): Collection<Prioritized<Synchronizable>> = setOf()
-
    fun allUserContent(): Collection<Prioritized<Synchronizable>> = Collections.unmodifiableList(
        setOf(
            prioritizedNotesSynchronizer,
-           prioritizedPhotosSynchronizer).distinct()
+           prioritizedPhotosSynchronizer)
    )
 
    fun allConfigContent(): Collection<Prioritized<Synchronizable>> = Collections.unmodifiableList(
        setOf(
            prioritizedGlobalConfigurationSynchronizer,
-           prioritizedLocalConfigurationSynchronizer).distinct()
+           prioritizedLocalConfigurationSynchronizer)
    )
 }
 ```
