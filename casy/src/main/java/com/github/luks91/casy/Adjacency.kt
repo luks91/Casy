@@ -61,15 +61,6 @@ private fun assertNoEmittersAreMissing(adjacency: Map<String, Node>, messager: M
                 throw IllegalStateException(message)
             }
         }
-
-        node.triggers.forEach { clazz ->
-            if (!adjacency.containsKey(clazz)) {
-                val message = "Emitter $nodeClazz is annotated as triggering $clazz " +
-                        "but the latter is not annotated with @${SyncEmitter::class.java.simpleName}"
-                messager.printMessage(Diagnostic.Kind.ERROR, message)
-                throw IllegalStateException(message)
-            }
-        }
     }
 }
 
@@ -78,16 +69,16 @@ private const val CYCLE_MESSAGE_PATTERN = "SyncEmitters form a cycle through the
 private fun assertNoCyclesInAdjacency(adjacency: Map<String, Node>, messager: Messager) =
         with(adjacency) {
             forEach { (clazz, node) ->
-                assertNoCyclesIn(node, { syncsAfter }, {
-                            messager.printMessage(Diagnostic.Kind.ERROR,
-                                    String.format(CYCLE_MESSAGE_PATTERN, "syncsAfter or triggeredBy", it))
-                            //triggeredBy relationship induces that an emitter is syncing after the emitter-trigger, thus
-                            //both should be mentioned as potential cause of the "syncsAfter" cycle
-                        }, listOf(clazz))
                 assertNoCyclesIn(node, { triggers }, {
-                            messager.printMessage(Diagnostic.Kind.ERROR,
-                                    String.format(CYCLE_MESSAGE_PATTERN, "triggeredBy", it))
-                        }, listOf(clazz))
+                    messager.printMessage(Diagnostic.Kind.ERROR,
+                            String.format(CYCLE_MESSAGE_PATTERN, "triggeredBy", it))
+                }, listOf(clazz))
+                assertNoCyclesIn(node, { syncsAfter }, {
+                    messager.printMessage(Diagnostic.Kind.ERROR,
+                            String.format(CYCLE_MESSAGE_PATTERN, "syncsAfter or triggeredBy", it))
+                    //triggeredBy relationship induces that an emitter is syncing after the emitter-trigger, thus
+                    //both should be mentioned as potential cause of the "syncsAfter" cycle
+                }, listOf(clazz))
             }
         }
 
