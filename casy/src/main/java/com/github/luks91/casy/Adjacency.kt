@@ -29,7 +29,7 @@ private fun buildAdjacencyMap(roundEnv: RoundEnvironment, strategy: ReflectionSt
         Map<String, Node> {
     val triggers = mutableMapOf<String, MutableSet<String>>().apply {
         roundEnv.getElementsAnnotatedWith(SyncEmitter::class.java).forEach {
-            val nodeClass = strategy.typeNameOf(it)
+            val nodeClass = strategy.stringTypeNameOf(it)
             val annotation = it.getAnnotation(SyncEmitter::class.java)
             val triggeredBy = strategy.triggeredByFrom(annotation)
 
@@ -39,10 +39,10 @@ private fun buildAdjacencyMap(roundEnv: RoundEnvironment, strategy: ReflectionSt
 
     return mutableMapOf<String, Node>().apply {
         roundEnv.getElementsAnnotatedWith(SyncEmitter::class.java).forEach {
-            val nodeClass = strategy.typeNameOf(it)
+            val nodeClass = strategy.stringTypeNameOf(it)
             val annotation = it.getAnnotation(SyncEmitter::class.java)
             put(nodeClass, Node(
-                    nodeClass, annotation.topics,
+                    nodeClass, annotation.topics.toList(),
                     mutableSetOf(*strategy.syncsAfterFrom(annotation)
                             .plus(strategy.triggeredByFrom(annotation))
                     ),

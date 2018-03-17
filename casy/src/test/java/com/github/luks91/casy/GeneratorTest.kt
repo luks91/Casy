@@ -34,7 +34,7 @@ class GeneratorTest {
     }
 
     @Test
-    fun classNameShoutMatchRoot() {
+    fun classNameShouldMatchRoot() {
         val topicToEmitter = mapOf<String, Collection<String>>()
         val priorities = mapOf("List" to 1L, "java.lang.String" to 2L)
         val envData = EnvironmentData(
@@ -109,21 +109,21 @@ class GeneratorTest {
                     "\n" +
                     "class Emitters2 internal constructor(\n" +
                     "      emitterList: List,\n" +
-                    "      emitterString: String,\n" +
                     "      emitterMap: Map,\n" +
-                    "      emitterSet: Set\n" +
+                    "      emitterSet: Set,\n" +
+                    "      emitterString: String\n" +
                     ") {\n" +
                     "   private val prioritizedList: Prioritized<List> = \n" +
                     "         Prioritized<List>(emitterList, 1)\n" +
-                    "\n" +
-                    "   private val prioritizedString: Prioritized<List> = \n" +
-                    "         Prioritized<List>(emitterString, 2)\n" +
                     "\n" +
                     "   private val prioritizedMap: Prioritized<List> = \n" +
                     "         Prioritized<List>(emitterMap, 1)\n" +
                     "\n" +
                     "   private val prioritizedSet: Prioritized<List> = \n" +
                     "         Prioritized<List>(emitterSet, 2)\n" +
+                    "\n" +
+                    "   private val prioritizedString: Prioritized<List> = \n" +
+                    "         Prioritized<List>(emitterString, 2)\n" +
                     "\n" +
                     "   private val topicsToEmitters: Map<kotlin.String, Set<Prioritized<List>>>\n" +
                     "\n" +
@@ -178,21 +178,21 @@ class GeneratorTest {
                         "\n" +
                         "class Emitters2 internal constructor(\n" +
                         "      emitterList: List,\n" +
-                        "      emitterString: String,\n" +
                         "      emitterMap: Map,\n" +
-                        "      emitterSet: Set\n" +
+                        "      emitterSet: Set,\n" +
+                        "      emitterString: String\n" +
                         ") {\n" +
                         "   private val prioritizedList: Prioritized<List> = \n" +
                         "         Prioritized<List>(emitterList, 1)\n" +
-                        "\n" +
-                        "   private val prioritizedString: Prioritized<List> = \n" +
-                        "         Prioritized<List>(emitterString, 2)\n" +
                         "\n" +
                         "   private val prioritizedMap: Prioritized<List> = \n" +
                         "         Prioritized<List>(emitterMap, 1)\n" +
                         "\n" +
                         "   private val prioritizedSet: Prioritized<List> = \n" +
                         "         Prioritized<List>(emitterSet, 2)\n" +
+                        "\n" +
+                        "   private val prioritizedString: Prioritized<List> = \n" +
+                        "         Prioritized<List>(emitterString, 2)\n" +
                         "\n" +
                         "   private val topicsToEmitters: Map<kotlin.String, Set<Prioritized<List>>>\n" +
                         "\n" +
@@ -254,21 +254,21 @@ class GeneratorTest {
                         "\n" +
                         "class Emitters2 internal constructor(\n" +
                         "      emitterList: List,\n" +
-                        "      emitterString: String,\n" +
                         "      emitterMap: Map,\n" +
-                        "      emitterSet: Set\n" +
+                        "      emitterSet: Set,\n" +
+                        "      emitterString: String\n" +
                         ") {\n" +
                         "   private val prioritizedList: Prioritized<List> = \n" +
                         "         Prioritized<List>(emitterList, 1)\n" +
-                        "\n" +
-                        "   private val prioritizedString: Prioritized<List> = \n" +
-                        "         Prioritized<List>(emitterString, 2)\n" +
                         "\n" +
                         "   private val prioritizedMap: Prioritized<List> = \n" +
                         "         Prioritized<List>(emitterMap, 1)\n" +
                         "\n" +
                         "   private val prioritizedSet: Prioritized<List> = \n" +
                         "         Prioritized<List>(emitterSet, 2)\n" +
+                        "\n" +
+                        "   private val prioritizedString: Prioritized<List> = \n" +
+                        "         Prioritized<List>(emitterString, 2)\n" +
                         "\n" +
                         "   private val topicsToEmitters: Map<kotlin.String, Set<Prioritized<List>>>\n" +
                         "\n" +

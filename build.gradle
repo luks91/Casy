@@ -28,7 +28,14 @@ allprojects {
     }
 
     task codeCoverageReport(type: JacocoReport) {
-        classDirectories = files('build/classes')
+        classDirectories = files('build/classes/kotlin/main')
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it,
+                //ReflectionStrategy and AnnotationStrategy are using complex type classes
+                //that are hard to test
+                excludes: ['**/ReflectionStrategy**', '**/AnnotationStrategy**']
+            )
+        })
         sourceDirectories = files('src/main/java')
 
         executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")

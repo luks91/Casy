@@ -34,6 +34,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    kapt 'com.github.luks91:casy:1.1.0'
-    api 'com.github.luks91:casy-annotations:1.1.0'
+    kapt project(':casy')
+    implementation project(':casy-annotations')
 }

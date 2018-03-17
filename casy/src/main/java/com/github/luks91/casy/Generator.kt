@@ -38,7 +38,7 @@ internal fun generateEmittersClass(envData: EnvironmentData): FileSpec {
     val prioritizedType = ParameterizedTypeName.get(
             Prioritized::class.asTypeName(), envData.rootTypeName)
 
-    envData.nodePriorities.forEach {
+    envData.nodePriorities.toSortedMap().forEach {
         val emitterFullName = it.key
         val className = ClassName.bestGuess(emitterFullName)
         val constructorParameterName = "emitter${className.simpleName()}"

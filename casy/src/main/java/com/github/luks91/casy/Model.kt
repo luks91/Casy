@@ -26,29 +26,6 @@ internal data class EnvironmentData(
 )
 
 internal data class Node(val nodeClass: String,
-                         val topics: Array<String>,
+                         val topics: Collection<String>,
                          val syncsAfter: Set<String>,
-                         val triggers: Set<String>) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Node
-
-        if (nodeClass != other.nodeClass) return false
-        if (!Arrays.equals(topics, other.topics)) return false
-        if (syncsAfter != other.syncsAfter) return false
-        if (triggers != other.triggers) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = nodeClass.hashCode()
-        result = 31 * result + Arrays.hashCode(topics)
-        result = 31 * result + syncsAfter.hashCode()
-        result = 31 * result + triggers.hashCode()
-        return result
-    }
-}
+                         val triggers: Set<String>)

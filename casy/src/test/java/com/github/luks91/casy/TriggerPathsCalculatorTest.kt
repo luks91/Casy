@@ -21,8 +21,8 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForTwoConnectedNodes() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf()),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node1"))
+                "node1" to Node("node1", listOf(), setOf(), setOf()),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node1"))
         ))
 
         assertEquals(listOf<String>(), paths["node1"])
@@ -32,8 +32,8 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForTwoDistinctNodes() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf()),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf()),
+                "node2" to Node("node2", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf<String>(), paths["node1"])
@@ -43,13 +43,13 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForStraightTree() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf("node2", "node3")),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node4", "node5")),
-                "node3" to Node("node3", arrayOf(), setOf(), setOf("node6")),
-                "node4" to Node("node4", arrayOf(), setOf(), setOf("node7")),
-                "node5" to Node("node5", arrayOf(), setOf(), setOf()),
-                "node6" to Node("node6", arrayOf(), setOf(), setOf()),
-                "node7" to Node("node7", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf("node2", "node3")),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node4", "node5")),
+                "node3" to Node("node3", listOf(), setOf(), setOf("node6")),
+                "node4" to Node("node4", listOf(), setOf(), setOf("node7")),
+                "node5" to Node("node5", listOf(), setOf(), setOf()),
+                "node6" to Node("node6", listOf(), setOf(), setOf()),
+                "node7" to Node("node7", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf("node7", "node4", "node5", "node2", "node6", "node3"), paths["node1"])
@@ -64,11 +64,11 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForComplexTree1() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf("node2", "node3")),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node4", "node5")),
-                "node3" to Node("node3", arrayOf(), setOf(), setOf("node4")),
-                "node4" to Node("node4", arrayOf(), setOf(), setOf("node5")),
-                "node5" to Node("node5", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf("node2", "node3")),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node4", "node5")),
+                "node3" to Node("node3", listOf(), setOf(), setOf("node4")),
+                "node4" to Node("node4", listOf(), setOf(), setOf("node5")),
+                "node5" to Node("node5", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf("node5", "node4", "node2", "node3"), paths["node1"])
@@ -81,10 +81,10 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForComplexTree2() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf("node2", "node4")),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node3")),
-                "node3" to Node("node3", arrayOf(), setOf(), setOf("node4")),
-                "node4" to Node("node4", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf("node2", "node4")),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node3")),
+                "node3" to Node("node3", listOf(), setOf(), setOf("node4")),
+                "node4" to Node("node4", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf("node4", "node3", "node2"), paths["node1"])
@@ -96,11 +96,11 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForComplexTree3() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf("node2", "node3")),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node4", "node5")),
-                "node3" to Node("node3", arrayOf(), setOf(), setOf()),
-                "node4" to Node("node4", arrayOf(), setOf(), setOf("node5")),
-                "node5" to Node("node5", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf("node2", "node3")),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node4", "node5")),
+                "node3" to Node("node3", listOf(), setOf(), setOf()),
+                "node4" to Node("node4", listOf(), setOf(), setOf("node5")),
+                "node5" to Node("node5", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf("node5", "node4", "node2", "node3"), paths["node1"])
@@ -113,10 +113,10 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForComplexTree4() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf("node2", "node3")),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node4")),
-                "node3" to Node("node3", arrayOf(), setOf(), setOf("node4")),
-                "node4" to Node("node4", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf("node2", "node3")),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node4")),
+                "node3" to Node("node3", listOf(), setOf(), setOf("node4")),
+                "node4" to Node("node4", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf("node4", "node2", "node3"), paths["node1"])
@@ -128,13 +128,13 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForComplexTree5() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf("node2", "node3", "node4")),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node5", "node6")),
-                "node3" to Node("node3", arrayOf(), setOf(), setOf("node5", "node7")),
-                "node4" to Node("node4", arrayOf(), setOf(), setOf("node3", "node6")),
-                "node5" to Node("node5", arrayOf(), setOf(), setOf("node7")),
-                "node6" to Node("node6", arrayOf(), setOf(), setOf("node7")),
-                "node7" to Node("node7", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf("node2", "node3", "node4")),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node5", "node6")),
+                "node3" to Node("node3", listOf(), setOf(), setOf("node5", "node7")),
+                "node4" to Node("node4", listOf(), setOf(), setOf("node3", "node6")),
+                "node5" to Node("node5", listOf(), setOf(), setOf("node7")),
+                "node6" to Node("node6", listOf(), setOf(), setOf("node7")),
+                "node7" to Node("node7", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf("node7", "node5", "node6", "node2", "node3", "node4"), paths["node1"])
@@ -149,11 +149,11 @@ class TriggerPathsCalculatorTest {
     @Test
     fun shouldCalculateCorrectlyForComplexTree6() {
         val paths = calculateTriggerPaths(mapOf(
-                "node1" to Node("node1", arrayOf(), setOf(), setOf("node3", "node4")),
-                "node2" to Node("node2", arrayOf(), setOf(), setOf("node4")),
-                "node3" to Node("node3", arrayOf(), setOf(), setOf("node5")),
-                "node4" to Node("node4", arrayOf(), setOf(), setOf("node5")),
-                "node5" to Node("node5", arrayOf(), setOf(), setOf())
+                "node1" to Node("node1", listOf(), setOf(), setOf("node3", "node4")),
+                "node2" to Node("node2", listOf(), setOf(), setOf("node4")),
+                "node3" to Node("node3", listOf(), setOf(), setOf("node5")),
+                "node4" to Node("node4", listOf(), setOf(), setOf("node5")),
+                "node5" to Node("node5", listOf(), setOf(), setOf())
         ))
 
         assertEquals(listOf("node5", "node3", "node4"), paths["node1"])

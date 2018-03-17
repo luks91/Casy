@@ -14,8 +14,8 @@
 package com.github.luks91.casy
 
 import com.github.luks91.casy.annotations.SyncEmitter
+import com.squareup.kotlinpoet.TypeName
 import io.leangen.geantyref.TypeFactory
-import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -46,7 +46,10 @@ class AdjacencyTest {
         emitterToSyncsAfter.clear()
         emittersToTriggeredBy.clear()
         reflectionStrategy = object: ReflectionStrategy {
-            override fun typeNameOf(element: Element): String = elementToName[element]!!
+            override fun typeNameOf(element: Element): TypeName {
+                TODO("not implemented")
+            }
+            override fun stringTypeNameOf(element: Element): String = elementToName[element]!!
             override fun syncsAfterFrom(emitter: SyncEmitter): Array<String> = emitterToSyncsAfter[emitter]!!
             override fun triggeredByFrom(emitter: SyncEmitter): Array<String> = emittersToTriggeredBy[emitter]!!
         }
@@ -120,7 +123,7 @@ class AdjacencyTest {
 
         val calculatedMap = calculateAdjacency(mockEnvironment, mockMessager, reflectionStrategy)
 
-        assertArrayEquals(calculatedMap["rains"]!!.topics, arrayOf("fromCloud", "weather1"))
+        assertEquals(calculatedMap["rains"]!!.topics, listOf("fromCloud", "weather1"))
         assertEquals(calculatedMap["rains"]!!.syncsAfter, setOf<String>())
         assertEquals(calculatedMap["rains"]!!.triggers, setOf<String>())
     }
@@ -151,14 +154,14 @@ class AdjacencyTest {
 
         assertEquals(8, calculatedMap.size)
 
-        assertArrayEquals(calculatedMap["rains"]!!.topics, arrayOf("fromCloud", "weather1"))
-        assertArrayEquals(calculatedMap["snows"]!!.topics, arrayOf("fromCloud", "weather2"))
-        assertArrayEquals(calculatedMap["thunders"]!!.topics, arrayOf("fromCloud", "weather3"))
-        assertArrayEquals(calculatedMap["clouds"]!!.topics, arrayOf("weatherEvent"))
-        assertArrayEquals(calculatedMap["tornados"]!!.topics, arrayOf("tornados, weather4"))
-        assertArrayEquals(calculatedMap["winds"]!!.topics, arrayOf("winds"))
-        assertArrayEquals(calculatedMap["floods"]!!.topics, arrayOf("weather5"))
-        assertArrayEquals(calculatedMap["weathers"]!!.topics, arrayOf<String>())
+        assertEquals(calculatedMap["rains"]!!.topics, listOf("fromCloud", "weather1"))
+        assertEquals(calculatedMap["snows"]!!.topics, listOf("fromCloud", "weather2"))
+        assertEquals(calculatedMap["thunders"]!!.topics, listOf("fromCloud", "weather3"))
+        assertEquals(calculatedMap["clouds"]!!.topics, listOf("weatherEvent"))
+        assertEquals(calculatedMap["tornados"]!!.topics, listOf("tornados, weather4"))
+        assertEquals(calculatedMap["winds"]!!.topics, listOf("winds"))
+        assertEquals(calculatedMap["floods"]!!.topics, listOf("weather5"))
+        assertEquals(calculatedMap["weathers"]!!.topics, listOf<String>())
     }
 
     @Test

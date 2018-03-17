@@ -14,6 +14,7 @@
 package com.github.luks91.casy
 
 import com.github.luks91.casy.annotations.SyncEmitter
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import javax.lang.model.element.Element
 import javax.lang.model.type.MirroredTypesException
@@ -24,17 +25,18 @@ import kotlin.reflect.jvm.jvmName
 internal interface ReflectionStrategy {
 
     companion object {
-        fun default() = AnnotationStrategy()
+        fun default() = AnnotationStrategy
     }
 
-    fun typeNameOf(element: Element): String
+    fun typeNameOf(element: Element): TypeName
+    fun stringTypeNameOf(element: Element): String
     fun syncsAfterFrom(emitter: SyncEmitter): Array<String>
     fun triggeredByFrom(emitter: SyncEmitter): Array<String>
 }
 
-internal class AnnotationStrategy : ReflectionStrategy {
-    override fun typeNameOf(element: Element) = element.asType().asTypeName().toString()
-
+internal object AnnotationStrategy : ReflectionStrategy {
+    override fun stringTypeNameOf(element: Element) = typeNameOf(element).toString()
+    override fun typeNameOf(element: Element) = element.asType().asTypeName()
     override fun syncsAfterFrom(emitter: SyncEmitter) = emitter.classesOf { syncsAfter }
     override fun triggeredByFrom(emitter: SyncEmitter) = emitter.classesOf { triggeredBy }
 
