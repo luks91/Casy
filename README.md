@@ -41,8 +41,8 @@ android {
     }
 }
 
-kapt 'com.github.luks91:casy:1.2.0'
-api 'com.github.luks91:casy-annotations:1.2.0'
+kapt 'com.github.luks91:casy:1.2.1'
+implementation 'com.github.luks91:casy-annotations:1.2.1'
 ```
 
 Then define common interface/class for all your emitter classes. Note that it's totally up to you how the interface will look like and what operations will it expose. That could be e.g. [Retrofit](http://square.github.io/retrofit/) interface.
