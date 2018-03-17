@@ -44,7 +44,7 @@ class ShadowsSynchronizer : Synchronizable {
 
 @SyncEmitter(
         topics = ["sync.shape", "sync.drawables"],
-        syncsAfter = [AccountSynchronizer::class]
+        syncsAfter = [ShadowsSynchronizer::class]
 )
 class ShapesSynchronizer: Synchronizable {
     override fun synchronize(): String {
