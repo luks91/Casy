@@ -71,13 +71,7 @@ class GeneratorTest {
                     "\n" +
                     "   fun all(): Collection<Prioritized<List>> = Collections.unmodifiableList(topicsToEmitters.values.flatMap { it }.distinct())\n" +
                     "\n" +
-                    "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> {\n" +
-                    "      if (topics.isEmpty()) {\n" +
-                    "         return all()\n" +
-                    "      } else {\n" +
-                    "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
-                    "      }\n" +
-                    "   }\n" +
+                    "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> = Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
                     "}\n",
                 textBuilder.toString())
     }
@@ -137,13 +131,7 @@ class GeneratorTest {
                     "\n" +
                     "   fun all(): Collection<Prioritized<List>> = Collections.unmodifiableList(topicsToEmitters.values.flatMap { it }.distinct())\n" +
                     "\n" +
-                    "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> {\n" +
-                    "      if (topics.isEmpty()) {\n" +
-                    "         return all()\n" +
-                    "      } else {\n" +
-                    "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
-                    "      }\n" +
-                    "   }\n" +
+                    "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> = Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
                     "}\n",
                 textBuilder.toString())
     }
@@ -209,13 +197,7 @@ class GeneratorTest {
                         "\n" +
                         "   fun all(): Collection<Prioritized<List>> = Collections.unmodifiableList(topicsToEmitters.values.flatMap { it }.distinct())\n" +
                         "\n" +
-                        "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> {\n" +
-                        "      if (topics.isEmpty()) {\n" +
-                        "         return all()\n" +
-                        "      } else {\n" +
-                        "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
-                        "      }\n" +
-                        "   }\n" +
+                        "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> = Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
                         "}\n",
                 textBuilder.toString())
     }
@@ -285,13 +267,7 @@ class GeneratorTest {
                         "\n" +
                         "   fun all(): Collection<Prioritized<List>> = Collections.unmodifiableList(topicsToEmitters.values.flatMap { it }.distinct())\n" +
                         "\n" +
-                        "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> {\n" +
-                        "      if (topics.isEmpty()) {\n" +
-                        "         return all()\n" +
-                        "      } else {\n" +
-                        "         return Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
-                        "      }\n" +
-                        "   }\n" +
+                        "   fun allBy(topics: List<kotlin.String>): Collection<Prioritized<List>> = Collections.unmodifiableList(topics.flatMap { topicsToEmitters[it] ?: setOf() }.distinct())\n" +
                         "\n" +
                         "   fun allAlpha(): Collection<Prioritized<List>> = Collections.unmodifiableSet(\n" +
                         "       setOf(\n" +
