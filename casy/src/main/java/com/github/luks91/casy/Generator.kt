@@ -113,15 +113,9 @@ private fun generateAllByMethod(emittersType: TypeName): FunSpec {
     return FunSpec.builder(ALL_BY_FUNCTION_NAME)
             .returns(emittersType)
             .addParameter(topicsName, topicsListType)
-            .addCode(CodeBlock.builder()
-                    .beginControlFlow("if ($topicsName.isEmpty())")
-                    .addStatement("return $ALL_FUNCTION_NAME()")
-                    .nextControlFlow("else")
-                    .addStatement(
-                            "return %T.unmodifiableList($topicsName.flatMap { $TOPICS_TO_EMITTERS_PROPERTY[it] ?: setOf() }" +
-                                    ".distinct())", Collections::class.asTypeName())
-                    .endControlFlow()
-                    .build())
+            .addStatement("return %T.unmodifiableList($topicsName.flatMap { " +
+                    "$TOPICS_TO_EMITTERS_PROPERTY[it] ?: setOf() }.distinct())",
+                    Collections::class.asTypeName())
             .build()
 }
 
